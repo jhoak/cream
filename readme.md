@@ -111,13 +111,17 @@ file with the format Chrome likes to read.
 
 ## How [do I use this]?
 
-To convert your bookmarks file to an importable HTML file named outfile.html, do this:
-```python cream.py <path-to-file-to-convert> >outfile.html```
+First off, note that Chrome's bookmark files are typically located here:
+> C:/Users/<your-name>/AppData/Local/Google/Chrome/User Data/Default
+This folder contains the two files, Bookmarks and Bookmarks.bak. I recommend using Bookmarks.bak
+because, if your bookmarks got wiped, chances are that the main Bookmarks file will be mostly empty
+(but your backup, Bookmarks.bak, might still be intact).
 
-If you want to use this tool because your bookmarks got wiped, I recommend you use the path to your
-.bak file as the path argument for this script, NOT the path to the non-bak file. (Note that the
-typical path to the Bookmarks.bak file looks like this:
-> C:/Users/<your-name>/AppData/Local/Google/Chrome/User Data/Default/Bookmarks.bak
+Now, to convert your bookmarks file to an importable HTML file named outfile.html, do this:
+```
+python cream.py <path-to-file-to-convert> >outfile.html
+```
 
 Once the conversion finishes, go into Chrome, start the bookmark manager, and under the 'Organize'
-drop-down menu click "Import bookmarks from HTML file". Then click the new file you made.
+drop-down menu, click "Import bookmarks from HTML file". Then click the new file you made. After
+Chrome imports the file, you should be good to go!
