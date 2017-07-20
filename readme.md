@@ -112,7 +112,7 @@ file with the format Chrome likes to read.
 ## How [do I use this]?
 
 First off, note that Chrome's bookmark files are typically located here:
-> C:/Users/<your-name>/AppData/Local/Google/Chrome/User Data/Default
+> C:/Users/your-name/AppData/Local/Google/Chrome/User Data/Default
 
 This folder contains the two files, Bookmarks and Bookmarks.bak. I recommend using Bookmarks.bak
 because, if your bookmarks got wiped, chances are that the main Bookmarks file will be mostly empty
