@@ -22,7 +22,7 @@ file, on the same day that Chrome recently wiped my bookmarks: 1:30AM for the .b
 Each file is actually just formatted in JSON, as one big object. It looks sort of like this:
 ```
 {
-	'checksum': 'some hex value',
+    'checksum': 'some hex value',
     'version': 'some number',
     'roots':
     {
@@ -45,7 +45,7 @@ this:
 	'type': 'folder',
 	'date_added': 'some number representing the date',
 	'date_modified': 'number representing the date',
-	'children': [list of objects representing links and nested directories]
+	'children': [list of objects representing URLs and nested directories]
 }
 ```
 And every object that represents a URL looks like this:
@@ -59,9 +59,9 @@ And every object that represents a URL looks like this:
 	'meta_info': {object representing some other metadata, like the date the page was last visited}
 }
 ```
-Note that 'meta_info' is optional.
+Note that 'meta_info' is optional. It might not be there.
 
-Likewise, the format that Chrome can import is a Netscape Bookmark File (but is basically HTML).
+Likewise, the format that Chrome can import is a Netscape Bookmark File (mostly HTML).
 It looks like this (try exporting your bookmarks to see another example):
 ```html
 <!DOCTYPE NETSCAPE-Bookmark-file-1>
@@ -95,14 +95,16 @@ actually in the 'Other Bookmarks' folder. But for whatever reason, the designers
 first header.
 
 Oh, and if you're super curious what I mean by a favicon as text, here's one:
-```data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB+0lEQVQ4jW2TS08bQRCEv55Zv03
+```
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB+0lEQVQ4jW2TS08bQRCEv55Zv03
 wIw5LIGABdrxCNiinXJByj/JrkXyKOMApIkLiV2CkYEKIbSzvTuewDxvCrFaa2e2u7qrqkW+fvyqAqiIivLYHsnO60hjz8uNr62X
 yarzJ0JInRY6iiMVigbDcrxYQkbgDVQUBBBTFGEMURTSaDY4/HRNGIf57n8HR4NUOTcaVuHIYhkz+TugFPZrNJvfje4IgYL2+zmQ
 yRSTuMn2faeCco9Vq0T/q42/6PM2f6B/3abxt4CLHTnsno5gWNkDGH6C10eKgc0B1rUohXyAIAiqVCuVymXqthnMRSSgigrdqkzG
 Gyx+X3I5uOflywvB0yF5nj1K5xPB0iLWWQrGAupg0kmggIqhzWGvpfuxyODhERNjv7NMLehhr6Pa61Oo1nHOIJC4gGCXuwKHkcjl
 227v4vk8YhrT32vibPlEYsf1hm3wh/8wJVcWoUxTFWst0OuXi/ILZbMb11TXnZ+eEi5Crn1ecfT/j4fcD1toYRGPrPRFBVDIXNt5
 tUClXGN2M2Nrewst5jMdjSsVSZncsWiJDehdSgGq1Sr6Q5+7XHcVikbU3a4zvxnFimpvMAsL/Ljw+PqJ/FM/zmM/nzG5neJ6Xig6
-J/ymI9/LWWWuXAhmDMSbjmw7A6jB5iaMZ6mpA9k8U0SX/jALwDxim9Rj8lykSAAAAAElFTkSuQmCC```
+J/ymI9/LWWWuXAhmDMSbjmw7A6jB5iaMZ6mpA9k8U0SX/jALwDxim9Rj8lykSAAAAAElFTkSuQmCC
+```
 
 Anyway, as you might expect, this tool basically just parses a Bookmarks[.bak] file and writes a new
 file with the format Chrome likes to read.
