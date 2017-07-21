@@ -44,14 +44,25 @@ bookmarks_root = roots['bookmark_bar']
 # used, anyway, so I'm ignoring it in this code.
 
 # Anyway, now to convert the file...
-# The date format of the bookmarks file is too weird so I'm just using a placeholder date
-# when I need it here
-newdate = datetime(1970, 6, 9, 4, 20)
-datestr = int(mktime(newdate.timetuple()))
-
-# Also need templates for print statements later
+# Need templates for print statements later
 dir_line_template = """<DT><H3 ADD_DATE=\"%s\" LAST_MODIFIED=\"%s\"%s>%s</H3>"""
 url_line_template = """<DT><A HREF=\"%s\" ADD_DATE=\"%s\">%s</A>"""
+
+def getdate(date_num):
+    """
+    Convert a date given from the bookmarks file to a legit date.
+
+    Interestingly enough, the dates in that file use Jan 1, 1601 as the epoch. Which is 369 years
+    off from the Unix epoch of 1/1/1970. So we need to take the number and remove 369 years from it.
+    """
+    # First convert to seconds from microseconds though.
+    date_num /= 1000000
+    date_num -= (369*365*24*60*60 + 24*60*60*89) # You are welcome to figure out what the 89
+                                                 # means. I have not figured it out myself. Doesn't
+                                                 # seem like it stands for leap year days. But it
+                                                 # makes the formula work...
+    # Anyway we now have seconds since the epoch so return this
+    return date_num
 
 def print_file_header():
     """This will print the stuff that goes at the top of the HTML file."""
@@ -72,7 +83,7 @@ def print_url(url_dict, indent_str):
     """Print a given URL, given as a dict."""
     url, url_name = url_dict['url'], url_dict['name']
     url_name = url_name.replace("<", "&lt;").replace(">", "&gt;")
-    url_date_added = datestr
+    url_date_added = getdate(url_dict['date_added'])
     url_line = url_line_template % (url, url_date_added, url_name)
     url_indent = indent_str + "    "
     print url_indent + url_line.encode('utf-8')
@@ -81,10 +92,9 @@ def traverse_dir(dir_dict, indent=0, root=False):
     """
     Will parse a JSON directory object and print the appropriate URLs and bookmark (sub)folders.
     """
-    # TODO use real dates
     name = dir_dict['name']
     name = name.replace("<", "&lt;").replace(">", "&gt;")
-    date_added, date_modded = datestr, datestr
+    date_added, date_modded = getdate(url_dict['date_added']), getdate(url_dict['date_modified'])
     indent_str = "    " * indent
     root_str = """PERSONAL_TOOLBAR_FOLDER=\"true\"""" if root else ""
     dir_line = dir_line_template % (date_added, date_modded, root_str, name)
