@@ -56,6 +56,7 @@ def getdate(date_num):
     off from the Unix epoch of 1/1/1970. So we need to take the number and remove 369 years from it.
     """
     # First convert to seconds from microseconds though.
+    date_num = long(date_num)
     date_num /= 1000000
     date_num -= (369*365*24*60*60 + 24*60*60*89) # You are welcome to figure out what the 89
                                                  # means. I have not figured it out myself. Doesn't
@@ -94,7 +95,7 @@ def traverse_dir(dir_dict, indent=0, root=False):
     """
     name = dir_dict['name']
     name = name.replace("<", "&lt;").replace(">", "&gt;")
-    date_added, date_modded = getdate(url_dict['date_added']), getdate(url_dict['date_modified'])
+    date_added, date_modded = getdate(dir_dict['date_added']), getdate(dir_dict['date_modified'])
     indent_str = "    " * indent
     root_str = """PERSONAL_TOOLBAR_FOLDER=\"true\"""" if root else ""
     dir_line = dir_line_template % (date_added, date_modded, root_str, name)
