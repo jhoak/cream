@@ -1,25 +1,23 @@
 import json
 from datetime import datetime
-from sys import argv, exit, stderr
+from sys import argv, exit
 from time import mktime
 
+# (Pls use the program correctly!)
 if len(argv) != 2:
-    stderr.write("Usage: python cream.py <path-to-file-to-convert>\n")
-    exit(-1)
+    exit("Usage: python cream.py <path-to-file-to-convert>\n")
 
-in_name = 'Bookmarks.bak'
+in_name = argv[1]
 with open(in_name, 'r') as f:
     data = f.read()
 for c in ('\t', '\r', '\n'):
     data = data.replace(c, '')
 
 # Get data into a dict (well, JSON format)
-obj = json.loads(data)
-outer_keys = obj.keys() # should be at least 'checksum', 'version', and 'roots'
+obj = json.loads(data) # keys of this dict should be at least 'checksum', 'version', and 'roots'
 
-roots = obj['roots']
-roots_keys = roots.keys()   # should be at least 'synced', 'sync_transaction_version',
-                            # 'bookmark_bar', and maybe 'other' for 'other bookmarks' folder
+roots = obj['roots']   # keys should be at least 'synced', 'sync_transaction_version',
+                       # 'bookmark_bar', and maybe 'other' for 'other bookmarks' folder
 
 bookmarks_root = roots['bookmark_bar']
 
@@ -45,12 +43,19 @@ bookmarks_root = roots['bookmark_bar']
 # Sometimes, a URL will have a 'sync_transaction_version' attribute. I don't know why. But it's not
 # used, anyway, so I'm ignoring it in this code.
 
+# Anyway, now to convert the file...
+# The date format of the bookmarks file is too weird so I'm just using a placeholder date
+# when I need it here
 newdate = datetime(1970, 6, 9, 4, 20)
 datestr = int(mktime(newdate.timetuple()))
+
+# Also need templates for print statements later
 dir_line_template = """<DT><H3 ADD_DATE=\"%s\" LAST_MODIFIED=\"%s\"%s>%s</H3>"""
 url_line_template = """<DT><A HREF=\"%s\" ADD_DATE=\"%s\">%s</A>"""
 
 def print_file_header():
+    """This will print the stuff that goes at the top of the HTML file."""
+
     header = """\
     <!DOCTYPE NETSCAPE-Bookmark-file-1>
     <!-- This is an automatically generated file.
@@ -58,17 +63,27 @@ def print_file_header():
     <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">
     <TITLE>Bookmarks</TITLE>
     <H1>Bookmarks</H1>
-    <DL><p>
+    <DL><p>\
     """
+    header = header.replace("    ", '') # remove indentation before printing it
+    print header
 
-    header = header.replace("    ", '') # remove indentation before printing
-    print header,
+def print_url(url_dict, indent_str):
+    """Print a given URL, given as a dict."""
+    url, url_name = url_dict['url'], url_dict['name']
+    url_name = url_name.replace("<", "&lt;").replace(">", "&gt;")
+    url_date_added = datestr
+    url_line = url_line_template % (url, url_date_added, url_name)
+    url_indent = indent_str + "    "
+    print url_indent + url_line.encode('utf-8')
 
 def traverse_dir(dir_dict, indent=0, root=False):
+    """
+    Will parse a JSON directory object and print the appropriate URLs and bookmark (sub)folders.
+    """
     # TODO use real dates
     name = dir_dict['name']
-    name = name.replace("<", "&lt;")
-    name = name.replace(">", "&gt;")
+    name = name.replace("<", "&lt;").replace(">", "&gt;")
     date_added, date_modded = datestr, datestr
     indent_str = "    " * indent
     root_str = """PERSONAL_TOOLBAR_FOLDER=\"true\"""" if root else ""
@@ -78,19 +93,14 @@ def traverse_dir(dir_dict, indent=0, root=False):
 
     children = dir_dict['children']
     for c in children:
-        if c['type'] == u'folder':
+        if c['type'] == 'folder':
             traverse_dir(c, indent + 1)
         else:
-            url, url_name = c['url'], c['name']
-            url_name = url_name.replace("<", "&lt;")
-            url_name = url_name.replace(">", "&gt;")
-            url_date_added = datestr
-            url_line = url_line_template % (url, url_date_added, url_name)
-            url_indent = indent_str + "    "
-            print url_indent + url_line.encode('utf-8')
+            print_url(c, indent_str)
     print indent_str + "</DL><p>"
 
 def print_other_bookmarks():
+    """Deal with the bookmarks in the "Other Bookmarks" folder, if any."""
     if 'other' not in obj.keys():
         return
     other_dict = obj['other']
@@ -98,11 +108,7 @@ def print_other_bookmarks():
         if c['type'] == 'folder':
             traverse_dir(c, 2)
         else:
-            url, url_name = c['url'], c['name']
-            url_date_added = datestr
-            url_line = url_line_template % (url, url_date_added, url_name)
-            url_indent = " " * 8
-            print url_indent + url_line
+            print_url(c, "    ")
 
 print_file_header()
 traverse_dir(bookmarks_root, indent=1, root=True)
